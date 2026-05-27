@@ -138,41 +138,39 @@ async function endSession() {
     reportBox.style.display = "block";
 
     reportBox.innerHTML = `
-      <h2 class="report-main-title">Report</h2>
+  <h2 class="report-main-title">تقرير الجلسة</h2>
 
-      <div class="clean-report-section">
-        <h3>Session Summary</h3>
-        <p>${report.session_summary || "No summary available."}</p>
-      </div>
+  <div class="clean-report-section">
+    <h3>ملخص الجلسة</h3>
+    <p>${report.session_summary || "لا يوجد ملخص متاح."}</p>
+  </div>
 
-      <div class="clean-report-section">
-        <h3>Emotional State</h3>
-        <p><strong>Dominant Emotion:</strong> ${report.emotional_state?.dominant || "-"}</p>
-        <p><strong>Stability:</strong> ${report.emotional_state?.stability || "-"}</p>
-      </div>
+  <div class="clean-report-section">
+    <h3>الحالة العاطفية</h3>
+    <p><strong>المشاعر السائدة:</strong> ${report.emotional_state?.dominant || "-"}</p>
+    <p><strong>الاستقرار العاطفي:</strong> ${report.emotional_state?.stability || "-"}</p>
+  </div>
 
-      <div class="clean-report-section">
-        <h3>Risk Status</h3>
-        <p>${
-          report.red_flags && report.red_flags.length > 0
-            ? report.red_flags.join(", ")
-            : "No risk detected"
-        }</p>
-      </div>
+  <div class="clean-report-section">
+    <h3>مستوى الخطورة</h3>
+    <p>${
+      report.red_flags && report.red_flags.length > 0
+        ? report.red_flags.join("، ")
+        : "لا توجد مؤشرات خطر"
+    }</p>
+  </div>
 
-      <div class="clean-report-section">
-        <h3>Recommendations</h3>
-        <ul>
-          ${
-            report.recommendations && report.recommendations.length > 0
-              ? report.recommendations
-                  .map((item) => `<li>${item}</li>`)
-                  .join("")
-              : "<li>No recommendations available.</li>"
-          }
-        </ul>
-      </div>
-    `;
+  <div class="clean-report-section">
+    <h3>التوصيات</h3>
+    <ul>
+      ${
+        report.recommendations && report.recommendations.length > 0
+          ? report.recommendations.map((item) => `<li>${item}</li>`).join("")
+          : "<li>لا توجد توصيات متاحة.</li>"
+      }
+    </ul>
+  </div>
+`;
 
     addMessage("Session ended. The report is ready.", "bot");
   } catch (error) {
