@@ -9,11 +9,9 @@ const pieChart = document.getElementById("pie-chart");
 const cameraStatus = document.getElementById("camera-status");
 
 const API_URL = "https://haden-emotion-api.onrender.com/predict_emotion";
-
-const INFERENCE_INTERVAL_MS = 1100;
+const INFERENCE_INTERVAL_MS = 120;
 const FACE_PADDING_RATIO = 0.22;
 const MIRROR_PREVIEW = true;
-const API_TIMEOUT_MS = 6000;
 
 const emotionCounts = {
   anger: 0,
@@ -34,9 +32,8 @@ let isFaceLoopRunning = false;
 let isSendingFrame = false;
 let noFaceFrames = 0;
 let lastFaceSeenAt = 0;
-let latestRequestId = 0;
-
-const FACE_STALE_MS = 1200;
+const FACE_STALE_MS = 1000;
+const API_TIMEOUT_MS = 7000;
 
 function renderChart() {
   emotionChart.innerHTML = "";
@@ -48,7 +45,6 @@ function renderChart() {
 
     const row = document.createElement("div");
     row.classList.add("emotion-row");
-
     row.innerHTML = `
       <div class="emotion-label">
         <span>${emotion}</span>
@@ -58,7 +54,6 @@ function renderChart() {
         <div class="emotion-bar" style="width:${percent}%"></div>
       </div>
     `;
-
     emotionChart.appendChild(row);
   });
 
@@ -71,7 +66,6 @@ function renderChart() {
     "#ec4899",
     "#14b8a6",
   ];
-
   let start = 0;
 
   const slices = Object.keys(emotionCounts).map((emotion, index) => {
@@ -79,7 +73,6 @@ function renderChart() {
       totalDetections === 0
         ? 0
         : (emotionCounts[emotion] / totalDetections) * 100;
-
     const end = start + percent;
     const slice = `${colors[index]} ${start}% ${end}%`;
     start = end;
@@ -94,7 +87,6 @@ function normalizeEmotion(rawEmotion) {
   const emotion = String(rawEmotion || "")
     .trim()
     .toLowerCase();
-
   const aliases = {
     angry: "anger",
     happiness: "happy",
@@ -102,7 +94,6 @@ function normalizeEmotion(rawEmotion) {
     fearful: "fear",
     surprised: "surprise",
   };
-
   return aliases[emotion] || emotion;
 }
 
@@ -118,7 +109,6 @@ function setStatus(message) {
 
 function resizeOverlayToVideo() {
   if (!video.videoWidth || !video.videoHeight) return;
-
   if (
     overlay.width !== video.videoWidth ||
     overlay.height !== video.videoHeight
@@ -131,7 +121,6 @@ function resizeOverlayToVideo() {
 function drawFaceBox(box) {
   resizeOverlayToVideo();
   overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
-
   if (!box) return;
 
   const x = MIRROR_PREVIEW ? overlay.width - (box.x + box.width) : box.x;
@@ -154,13 +143,11 @@ function clampBox(box) {
   const y = Math.max(0, Math.min(box.y, video.videoHeight - 1));
   const width = Math.max(1, Math.min(box.width, video.videoWidth - x));
   const height = Math.max(1, Math.min(box.height, video.videoHeight - y));
-
   return { x, y, width, height };
 }
 
 function getBoxFromDetection(detection) {
   const relativeBox = detection?.locationData?.relativeBoundingBox;
-
   if (relativeBox) {
     return clampBox({
       x: relativeBox.xMin * video.videoWidth,
@@ -173,10 +160,10 @@ function getBoxFromDetection(detection) {
   const bbox = detection?.boundingBox;
   if (!bbox) return null;
 
+  // Some MediaPipe versions return normalized center values, others return pixel values.
   const width = bbox.width <= 1 ? bbox.width * video.videoWidth : bbox.width;
   const height =
     bbox.height <= 1 ? bbox.height * video.videoHeight : bbox.height;
-
   const xCenter =
     bbox.xCenter <= 1 ? bbox.xCenter * video.videoWidth : bbox.xCenter;
   const yCenter =
@@ -193,7 +180,6 @@ function getBoxFromDetection(detection) {
 function getPaddedBox(box) {
   const padX = box.width * FACE_PADDING_RATIO;
   const padY = box.height * FACE_PADDING_RATIO;
-
   return clampBox({
     x: box.x - padX,
     y: box.y - padY,
@@ -205,13 +191,10 @@ function getPaddedBox(box) {
 function createFaceBlob(box) {
   return new Promise((resolve) => {
     const padded = getPaddedBox(box);
-
     const canvas = document.createElement("canvas");
-    canvas.width = 96;
-    canvas.height = 96;
-
+    canvas.width = 128;
+    canvas.height = 128;
     const ctx = canvas.getContext("2d");
-
     ctx.drawImage(
       video,
       padded.x,
@@ -223,21 +206,19 @@ function createFaceBlob(box) {
       canvas.width,
       canvas.height,
     );
-
-    canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.42);
+    canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.58);
   });
 }
 
 async function startCamera() {
   try {
     let stream;
-
     try {
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { exact: "user" },
-          width: { ideal: 480 },
-          height: { ideal: 360 },
+          width: { ideal: 640 },
+          height: { ideal: 480 },
         },
         audio: false,
       });
@@ -245,8 +226,8 @@ async function startCamera() {
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "user",
-          width: { ideal: 480 },
-          height: { ideal: 360 },
+          width: { ideal: 640 },
+          height: { ideal: 480 },
         },
         audio: false,
       });
@@ -255,17 +236,18 @@ async function startCamera() {
     video.srcObject = stream;
     await video.play();
 
-    const boot = async () => {
+    video.onloadedmetadata = async () => {
       resizeOverlayToVideo();
       setStatus("Looking for face...");
       await setupFaceDetector();
       startFaceLoop();
     };
 
-    video.onloadedmetadata = boot;
-
     if (video.readyState >= 2) {
-      await boot();
+      resizeOverlayToVideo();
+      setStatus("Looking for face...");
+      await setupFaceDetector();
+      startFaceLoop();
     }
   } catch (error) {
     emotionText.innerText = "Camera Error";
@@ -280,7 +262,6 @@ async function setupFaceDetector() {
     setStatus("Face detector library failed");
     return;
   }
-
   if (faceDetector) return;
 
   faceDetector = new FaceDetection({
@@ -311,30 +292,23 @@ async function setupFaceDetector() {
           liveBar.style.width = "0%";
         }
       }
-
       return;
     }
 
     lastFaceSeenAt = Date.now();
     noFaceFrames = 0;
-
     const boxes = detections.map(getBoxFromDetection).filter(Boolean);
     if (boxes.length === 0) return;
 
     boxes.sort((a, b) => b.width * b.height - a.width * a.height);
-
     latestFaceBox = boxes[0];
     drawFaceBox(latestFaceBox);
-
-    if (!isDetecting) {
-      setStatus("Face detected");
-    }
+    setStatus(isDetecting ? "Analyzing..." : "Face detected");
   });
 }
 
 async function startFaceLoop() {
   if (!faceDetector || isFaceLoopRunning) return;
-
   isFaceLoopRunning = true;
 
   async function loop() {
@@ -350,7 +324,6 @@ async function startFaceLoop() {
     }
 
     const now = Date.now();
-
     if (
       latestFaceBox &&
       !isDetecting &&
@@ -372,14 +345,10 @@ async function detectEmotion(faceBox) {
     !faceBox ||
     video.videoWidth === 0 ||
     video.videoHeight === 0
-  ) {
+  )
     return;
-  }
-
   isDetecting = true;
   setStatus("Analyzing...");
-
-  const requestId = ++latestRequestId;
 
   try {
     const blob = await createFaceBlob(faceBox);
@@ -400,22 +369,15 @@ async function detectEmotion(faceBox) {
 
     clearTimeout(timeoutId);
 
-    if (requestId !== latestRequestId) return;
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
 
     const data = await response.json();
-
     const emotion = normalizeEmotion(
       data.emotion || data.label || data.prediction,
     );
-
     const confidence = normalizeConfidence(
       data.confidence || data.score || data.probability,
     );
-
     const confidencePercent = Math.round(confidence * 100);
 
     if (
@@ -425,7 +387,6 @@ async function detectEmotion(faceBox) {
       emotionText.innerText = "Unknown";
       confidenceText.innerText = `Confidence: ${confidencePercent}%`;
       liveBar.style.width = `${confidencePercent}%`;
-      setStatus("Face detected");
       return;
     }
 
@@ -435,18 +396,16 @@ async function detectEmotion(faceBox) {
 
     emotionCounts[emotion] += 1;
     totalDetections += 1;
-
     renderChart();
     setStatus("Face detected");
   } catch (error) {
     if (error.name === "AbortError") {
-      setStatus("Render is slow");
-      confidenceText.innerText = "Waiting for Render response...";
+      setStatus("Backend is slow...");
+      confidenceText.innerText = "Waiting for faster backend response.";
     } else {
       setStatus("API Error");
-      confidenceText.innerText = "Check Render service.";
+      confidenceText.innerText = "Check backend / Render service.";
     }
-
     console.error(error);
   } finally {
     isDetecting = false;
