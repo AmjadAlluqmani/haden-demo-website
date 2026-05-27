@@ -9,7 +9,7 @@ const pieChart = document.getElementById("pie-chart");
 const cameraStatus = document.getElementById("camera-status");
 
 const API_URL = "https://haden-emotion-api.onrender.com/predict_emotion";
-const INFERENCE_INTERVAL_MS = 650;
+const INFERENCE_INTERVAL_MS = 120;
 const FACE_PADDING_RATIO = 0.22;
 const MIRROR_PREVIEW = true;
 
@@ -31,6 +31,9 @@ let faceDetector = null;
 let isFaceLoopRunning = false;
 let isSendingFrame = false;
 let noFaceFrames = 0;
+let lastFaceSeenAt = 0;
+const FACE_STALE_MS = 1000;
+const API_TIMEOUT_MS = 7000;
 
 function renderChart() {
   emotionChart.innerHTML = "";
@@ -189,8 +192,8 @@ function createFaceBlob(box) {
   return new Promise((resolve) => {
     const padded = getPaddedBox(box);
     const canvas = document.createElement("canvas");
-    canvas.width = 224;
-    canvas.height = 224;
+    canvas.width = 128;
+    canvas.height = 128;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(
       video,
@@ -203,7 +206,7 @@ function createFaceBlob(box) {
       canvas.width,
       canvas.height,
     );
-    canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.92);
+    canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.58);
   });
 }
 
@@ -276,17 +279,23 @@ async function setupFaceDetector() {
 
     if (detections.length === 0) {
       noFaceFrames += 1;
-      if (noFaceFrames >= 5) {
+      const faceIsStale = Date.now() - lastFaceSeenAt > FACE_STALE_MS;
+
+      if (noFaceFrames >= 8 && faceIsStale) {
         latestFaceBox = null;
         drawFaceBox(null);
         setStatus("No face detected");
-        emotionText.innerText = "No face detected";
-        confidenceText.innerText = "Confidence: 0%";
-        liveBar.style.width = "0%";
+
+        if (!isDetecting) {
+          emotionText.innerText = "No face detected";
+          confidenceText.innerText = "Confidence: 0%";
+          liveBar.style.width = "0%";
+        }
       }
       return;
     }
 
+    lastFaceSeenAt = Date.now();
     noFaceFrames = 0;
     const boxes = detections.map(getBoxFromDetection).filter(Boolean);
     if (boxes.length === 0) return;
@@ -348,11 +357,17 @@ async function detectEmotion(faceBox) {
     const formData = new FormData();
     formData.append("file", blob, "face.jpg");
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+
     const response = await fetch(API_URL, {
       method: "POST",
       body: formData,
       cache: "no-store",
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) throw new Error(`API error: ${response.status}`);
 
@@ -384,9 +399,13 @@ async function detectEmotion(faceBox) {
     renderChart();
     setStatus("Face detected");
   } catch (error) {
-    emotionText.innerText = "API Error";
-    confidenceText.innerText = "Check backend / Render service.";
-    setStatus("API Error");
+    if (error.name === "AbortError") {
+      setStatus("Backend is slow...");
+      confidenceText.innerText = "Waiting for faster backend response.";
+    } else {
+      setStatus("API Error");
+      confidenceText.innerText = "Check backend / Render service.";
+    }
     console.error(error);
   } finally {
     isDetecting = false;
