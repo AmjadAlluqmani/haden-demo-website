@@ -8,7 +8,8 @@ const liveBar = document.getElementById("live-bar");
 const pieChart = document.getElementById("pie-chart");
 const cameraStatus = document.getElementById("camera-status");
 
-const API_URL = "https://haden-emotion-api.onrender.com/predict_emotion";
+//const API_URL = "https://haden-emotion-api.onrender.com/predict_emotion";
+const API_URL = "http://192.168.100.52:8002/predict_emotion";
 const INFERENCE_INTERVAL_MS = 120;
 const FACE_PADDING_RATIO = 0.22;
 const MIRROR_PREVIEW = true;
