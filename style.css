@@ -493,3 +493,203 @@ button:disabled {
     height: 85px;
   }
 }
+
+/* ===== Face Detection Page Fixes ===== */
+.face-page {
+  align-items: flex-start;
+  min-height: 100dvh;
+}
+
+.face-container {
+  width: min(100% - 28px, 1120px);
+  padding: 78px 0 36px;
+}
+
+.face-container h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  margin-bottom: 12px;
+}
+
+.face-container .subtitle {
+  margin-bottom: 24px;
+}
+
+.face-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.2fr) minmax(280px, 0.8fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.camera-card,
+.face-stats-box {
+  background: rgba(22, 27, 34, 0.96);
+  border: 1px solid #30363d;
+  border-radius: 25px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+}
+
+.camera-card {
+  padding: 18px;
+}
+
+.camera-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #05070b;
+  border: 1px solid #30363d;
+}
+
+.face-page video#video {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  display: block;
+  object-fit: cover;
+  border: none;
+  border-radius: 0;
+  transform: scaleX(-1);
+}
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.camera-status {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(13, 17, 23, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  color: #e5e7eb;
+  font-size: 0.88rem;
+  backdrop-filter: blur(8px);
+}
+
+.emotion-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 4px 8px;
+  text-align: left;
+}
+
+.summary-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #9ca3af;
+  font-size: 0.86rem;
+}
+
+.emotion-summary h2 {
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  color: #ffffff;
+  text-transform: capitalize;
+}
+
+.emotion-summary p {
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.camera-card .live-confidence {
+  margin-top: 10px;
+  height: 13px;
+}
+
+.face-stats-box {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 22px;
+}
+
+.face-stats-box .pie-chart {
+  width: 155px;
+  height: 155px;
+}
+
+@media (max-width: 900px) {
+  .face-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .face-container {
+    padding-top: 72px;
+  }
+}
+
+@media (max-width: 700px) {
+  body {
+    align-items: flex-start;
+  }
+
+  .face-container {
+    width: min(100% - 20px, 520px);
+    padding: 70px 0 24px;
+  }
+
+  .face-container .subtitle {
+    margin-bottom: 16px;
+    font-size: 0.98rem;
+  }
+
+  .face-page .back-btn {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    left: 12px;
+    margin: 0;
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+  }
+
+  .camera-card {
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .camera-wrapper {
+    border-radius: 18px;
+    aspect-ratio: 3 / 4;
+  }
+
+  .emotion-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px 2px 6px;
+  }
+
+  .emotion-summary p {
+    white-space: normal;
+  }
+
+  .face-stats-box {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .emotion-row {
+    margin-bottom: 14px;
+  }
+
+  .emotion-label {
+    font-size: 0.92rem;
+  }
+
+  .face-stats-box .pie-chart {
+    width: 135px;
+    height: 135px;
+  }
+}

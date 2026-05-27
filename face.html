@@ -7,35 +7,48 @@
     <link rel="stylesheet" href="style.css" />
   </head>
 
-  <body>
+  <body class="face-page">
     <a href="index.html" class="back-btn">← Back</a>
 
-    <div class="container">
+    <main class="container face-container">
       <h1>Emotion Detection</h1>
-
       <p class="subtitle">Real-time facial emotion analysis.</p>
 
-      <video id="video" autoplay playsinline></video>
+      <section class="face-layout">
+        <div class="camera-card">
+          <div class="camera-wrapper">
+            <video id="video" autoplay playsinline muted></video>
+            <canvas id="overlay"></canvas>
+            <div id="camera-status" class="camera-status">
+              Starting camera...
+            </div>
+          </div>
 
-      <div class="emotion-box">
-        <h2 id="emotion">Waiting...</h2>
-        <p id="confidence"></p>
+          <div class="emotion-summary">
+            <div>
+              <span class="summary-label">Current emotion</span>
+              <h2 id="emotion">No face detected</h2>
+            </div>
+            <p id="confidence">Confidence: 0%</p>
+          </div>
 
-        <div class="live-confidence">
-          <div id="live-bar" class="live-bar"></div>
+          <div class="live-confidence">
+            <div id="live-bar" class="live-bar"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="emotion-chart-box">
-        <h2>Emotion Statistics</h2>
-        <div id="emotion-chart"></div>
+        <div class="emotion-chart-box face-stats-box">
+          <h2>Emotion Statistics</h2>
+          <div id="emotion-chart"></div>
 
-        <div class="pie-wrapper">
-          <div id="pie-chart" class="pie-chart"></div>
+          <div class="pie-wrapper">
+            <div id="pie-chart" class="pie-chart"></div>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection/face_detection.js"></script>
     <script src="face.js"></script>
   </body>
 </html>
