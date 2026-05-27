@@ -714,3 +714,155 @@ body {
     height: 132px;
   }
 }
+
+/* ===== Text Chat Responsive Fix ===== */
+
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.chat-container {
+  width: min(100% - 32px, 760px);
+  margin: 0 auto;
+  padding: 90px 0 40px;
+  text-align: center;
+}
+
+.chat-container h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+
+.setup-box {
+  width: 100%;
+  max-width: 500px;
+  padding: 28px;
+  margin: 24px auto;
+}
+
+.setup-box input,
+.setup-box select,
+.setup-box button {
+  width: 100%;
+  min-width: 0;
+}
+
+#chat-section {
+  width: 100%;
+}
+
+.chat-box {
+  width: 100%;
+}
+
+.input-area {
+  width: 100%;
+}
+
+.input-area input {
+  min-width: 0;
+}
+
+.back-btn {
+  top: 18px;
+  left: 18px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  body {
+    display: block;
+    min-height: 100dvh;
+  }
+
+  .chat-container {
+    width: calc(100% - 28px);
+    padding: 86px 0 28px;
+  }
+
+  .chat-container h1 {
+    font-size: 2rem;
+    margin-bottom: 22px;
+  }
+
+  .setup-box {
+    padding: 22px;
+    border-radius: 22px;
+    margin: 0 auto;
+    gap: 13px;
+  }
+
+  .setup-box h2 {
+    text-align: left;
+    font-size: 1.15rem;
+  }
+
+  input,
+  select,
+  button {
+    padding: 15px;
+    font-size: 0.95rem;
+    border-radius: 13px;
+  }
+
+  .back-btn {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    margin: 0;
+    padding: 9px 12px;
+    font-size: 0.85rem;
+    border-radius: 12px;
+  }
+
+  .chat-box {
+    height: 58dvh;
+    margin-top: 18px;
+    padding: 14px;
+  }
+
+  .input-area {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .message {
+    max-width: 92%;
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+
+  .user {
+    margin-left: auto;
+  }
+
+  .bot {
+    margin-right: auto;
+  }
+
+  .end-btn {
+    width: 100%;
+  }
+
+  .report-box {
+    padding: 14px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 390px) {
+  .chat-container {
+    width: calc(100% - 22px);
+  }
+
+  .setup-box {
+    padding: 18px;
+  }
+
+  .chat-container h1 {
+    font-size: 1.8rem;
+  }
+}
