@@ -393,60 +393,57 @@ async function endSession() {
     const report = data.report || {};
 
     reportBox.style.display = "block";
-
     reportBox.innerHTML = `
-      <div class="report-card">
-        <h2>Session Summary</h2>
-        <p>${report.session_summary || "No summary available."}</p>
-      </div>
+  <h2 class="report-main-title">تقرير الجلسة</h2>
 
-      <div class="report-card">
-        <h2>Emotional State</h2>
-        <p><strong>Dominant Emotion:</strong> ${
-          report.emotional_state?.dominant || "-"
-        }</p>
-        <p><strong>Stability:</strong> ${
-          report.emotional_state?.stability || "-"
-        }</p>
-      </div>
+  <div class="clean-report-section">
+    <h3>ملخص الجلسة</h3>
+    <p>${report.session_summary || "لا يوجد ملخص متاح."}</p>
+  </div>
 
-      <div class="report-card">
-        <h2>Engagement</h2>
-        <p><strong>Level:</strong> ${report.engagement?.level || "-"}</p>
-        <p>${report.engagement?.style || ""}</p>
-      </div>
+  <div class="clean-report-section">
+    <h3>الحالة العاطفية</h3>
+    <p>
+      <strong>المشاعر السائدة:</strong>
+      ${report.emotional_state?.dominant || "-"}
+    </p>
 
-      <div class="report-card">
-        <h2>Risk Flags</h2>
-        <p>${
-          report.red_flags && report.red_flags.length > 0
-            ? report.red_flags.join(", ")
-            : "No risk detected"
-        }</p>
-      </div>
+    <p>
+      <strong>الاستقرار العاطفي:</strong>
+      ${report.emotional_state?.stability || "-"}
+    </p>
+  </div>
 
-      <div class="report-card">
-        <h2>Recommendations</h2>
-        <ul>
-          ${
-            report.recommendations
-              ?.map((item) => `<li>${item}</li>`)
-              .join("") || "<li>No recommendations available.</li>"
-          }
-        </ul>
-      </div>
+  <div class="clean-report-section">
+    <h3>مستوى الخطورة</h3>
 
-      <div class="report-card">
-        <h2>Priority</h2>
-        <p>${report.priority || "-"}</p>
-      </div>
-    `;
+    <p>
+      ${
+        report.red_flags && report.red_flags.length > 0
+          ? report.red_flags.join("، ")
+          : "لا توجد مؤشرات خطر"
+      }
+    </p>
+  </div>
+
+  <div class="clean-report-section">
+    <h3>التوصيات</h3>
+
+    <ul>
+      ${
+        report.recommendations && report.recommendations.length > 0
+          ? report.recommendations.map((item) => `<li>${item}</li>`).join("")
+          : "<li>لا توجد توصيات متاحة.</li>"
+      }
+    </ul>
+  </div>
+`;
 
     addMessage("Session ended. The report is shown below.", "bot");
 
     input.disabled = true;
     sendBtn.disabled = true;
-    endBtn.disabled = true;
+    endBtn.style.display = "none";
     textModeBtn.disabled = true;
     voiceModeBtn.disabled = true;
 
