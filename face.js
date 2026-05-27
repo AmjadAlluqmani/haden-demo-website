@@ -9,7 +9,7 @@ const pieChart = document.getElementById("pie-chart");
 const cameraStatus = document.getElementById("camera-status");
 
 const API_URL = "https://haden-emotion-api.onrender.com/predict_emotion";
-const INFERENCE_INTERVAL_MS = 1400;
+const INFERENCE_INTERVAL_MS = 3000;
 const FACE_PADDING_RATIO = 0.22;
 const MIRROR_PREVIEW = true;
 
@@ -33,7 +33,7 @@ let isSendingFrame = false;
 let noFaceFrames = 0;
 let lastFaceSeenAt = 0;
 const FACE_STALE_MS = 1000;
-const API_TIMEOUT_MS = 3500;
+const API_TIMEOUT_MS = 20000;
 function renderChart() {
   emotionChart.innerHTML = "";
 
@@ -191,8 +191,8 @@ function createFaceBlob(box) {
   return new Promise((resolve) => {
     const padded = getPaddedBox(box);
     const canvas = document.createElement("canvas");
-    canvas.width = 64;
-    canvas.height = 64;
+    canvas.width = 96;
+    canvas.height = 96;
     const ctx = canvas.getContext("2d");
     ctx.drawImage(
       video,
@@ -205,7 +205,7 @@ function createFaceBlob(box) {
       canvas.width,
       canvas.height,
     );
-    canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.28);
+    canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.45);
   });
 }
 
