@@ -1,37 +1,56 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Haden Demo</title>
+    <title>تجربة حاضن</title>
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
     <div class="overlay"></div>
 
-    <div class="container">
-      <h1>Haden AI Demo</h1>
+    <div class="container home-container">
+      <div class="home-hero">
+        <span class="home-badge">نسخة تجريبية</span>
 
-      <p class="subtitle">
-        AI Companion for Adopted Children<br />
-        Powered by Emotion AI & Interactive Noor Sessions
-      </p>
+        <h1>تجربة حاضن الذكية</h1>
 
-      <div class="cards">
-        <a href="face.html" class="card">
-          <h2>Emotion Detection</h2>
-          <p>Real-time facial emotion analysis with live statistics.</p>
+        <p class="subtitle">
+          رفيق ذكي لدعم الأطفال المحتضنين<br />
+          مدعوم بتحليل المشاعر وجلسات نور التفاعلية
+        </p>
+      </div>
+
+      <div class="cards home-cards">
+        <a href="face.html" class="card home-card emotion-card">
+          <div class="card-glow emotion-glow"></div>
+
+          <h2>تحليل المشاعر</h2>
+
+          <p>
+            تحليل مباشر لتعابير الوجه مع عرض إحصائيات المشاعر أثناء التجربة.
+          </p>
         </a>
 
-        <a href="text-chat.html" class="card">
-          <h2>Noor Text Chat</h2>
-          <p>Fast text-based conversation with Noor.</p>
+        <a href="text-chat.html" class="card home-card chat-card">
+          <div class="card-glow chat-glow"></div>
+
+          <h2>محادثة نور النصية</h2>
+
+          <p>محادثة سريعة مع نور عن طريق الكتابة، مناسبة للتجربة المباشرة.</p>
         </a>
 
-        <a href="avatar-chat.html" class="card">
-          <h2>Noor Avatar</h2>
-          <p>Interactive avatar experience with video replies.</p>
+        <a href="avatar-chat.html" class="card home-card avatar-card">
+          <div class="card-glow avatar-glow"></div>
+
+          <h2>نور بالأفاتار</h2>
+
+          <p>تجربة تفاعلية مع نور باستخدام فيديوهات وردود صوتية واقعية.</p>
+
+          <span class="delay-warning">
+            تنبيه: الردود قد تستغرق دقيقة تقريبًا
+          </span>
         </a>
       </div>
     </div>

@@ -991,3 +991,168 @@ button:disabled {
     height: 42dvh;
   }
 }
+
+/* ===== Home Page Final Design ===== */
+
+.home-container {
+  width: min(100% - 32px, 1050px);
+  padding: 52px 0 42px;
+}
+
+.home-hero {
+  margin-bottom: 34px;
+}
+
+.home-badge {
+  display: inline-block;
+  margin-bottom: 16px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(139, 92, 246, 0.14);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #d8b4fe;
+  font-size: 0.88rem;
+}
+
+.home-container h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 14px;
+}
+
+.home-container .subtitle {
+  margin-bottom: 0;
+  color: #cbd5e1;
+  line-height: 1.9;
+  font-size: 1rem;
+}
+
+.home-cards {
+  gap: 22px;
+}
+
+.home-card {
+  position: relative;
+  overflow: hidden;
+  width: 315px;
+  min-height: 240px;
+  padding: 30px 24px;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: rgba(22, 27, 34, 0.96);
+  border: 1px solid #30363d;
+  backdrop-filter: blur(10px);
+}
+
+.home-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+.emotion-card::before {
+  background: radial-gradient(circle at top right, #22c55e, transparent 48%);
+}
+
+.chat-card::before {
+  background: radial-gradient(circle at top right, #3b82f6, transparent 48%);
+}
+
+.avatar-card::before {
+  background: radial-gradient(circle at top right, #f59e0b, transparent 48%);
+}
+
+.card-glow {
+  width: 78px;
+  height: 5px;
+  border-radius: 999px;
+  margin-bottom: 24px;
+}
+
+.emotion-glow {
+  background: linear-gradient(90deg, #22c55e, transparent);
+  box-shadow: 0 0 28px rgba(34, 197, 94, 0.6);
+}
+
+.chat-glow {
+  background: linear-gradient(90deg, #3b82f6, transparent);
+  box-shadow: 0 0 28px rgba(59, 130, 246, 0.6);
+}
+
+.avatar-glow {
+  background: linear-gradient(90deg, #f59e0b, transparent);
+  box-shadow: 0 0 28px rgba(245, 158, 11, 0.6);
+}
+
+.home-card h2 {
+  font-size: 1.45rem;
+  margin-bottom: 12px;
+}
+
+.home-card p {
+  color: #d1d5db;
+  font-size: 0.94rem;
+  line-height: 1.9;
+}
+
+.delay-warning {
+  margin-top: 18px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #fcd34d;
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 700px) {
+  .home-container {
+    width: calc(100% - 26px);
+    padding: 38px 0 26px;
+  }
+
+  .home-hero {
+    margin-bottom: 22px;
+  }
+
+  .home-container h1 {
+    font-size: 2rem;
+  }
+
+  .home-container .subtitle {
+    font-size: 0.92rem;
+    line-height: 1.8;
+  }
+
+  .home-cards {
+    gap: 16px;
+  }
+
+  .home-card {
+    width: 100%;
+    min-height: 185px;
+    padding: 24px 20px;
+    border-radius: 22px;
+  }
+
+  .card-glow {
+    width: 64px;
+    margin-bottom: 18px;
+  }
+
+  .home-card h2 {
+    font-size: 1.28rem;
+  }
+
+  .home-card p {
+    font-size: 0.86rem;
+  }
+
+  .delay-warning {
+    font-size: 0.76rem;
+  }
+}
