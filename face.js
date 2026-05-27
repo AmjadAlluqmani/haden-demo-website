@@ -9,7 +9,7 @@ const pieChart = document.getElementById("pie-chart");
 const cameraStatus = document.getElementById("camera-status");
 
 const API_URL = "https://haden-emotion-api.onrender.com/predict_emotion";
-const INFERENCE_INTERVAL_MS = 3000;
+const INFERENCE_INTERVAL_MS = 2200;
 const FACE_PADDING_RATIO = 0.22;
 const MIRROR_PREVIEW = true;
 
