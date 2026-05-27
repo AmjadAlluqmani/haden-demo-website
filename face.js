@@ -9,8 +9,9 @@ const pieChart = document.getElementById("pie-chart");
 const cameraStatus = document.getElementById("camera-status");
 
 const API_URL = "https://haden-emotion-api.onrender.com/predict_emotion";
-const INFERENCE_INTERVAL_MS = 1200;
-const FACE_PADDING_RATIO = 0.18;
+const INFERENCE_INTERVAL_MS = 650;
+const FACE_PADDING_RATIO = 0.22;
+const MIRROR_PREVIEW = true;
 
 const emotionCounts = {
   anger: 0,
@@ -29,6 +30,7 @@ let latestFaceBox = null;
 let faceDetector = null;
 let isFaceLoopRunning = false;
 let isSendingFrame = false;
+let noFaceFrames = 0;
 
 function renderChart() {
   emotionChart.innerHTML = "";
@@ -40,7 +42,6 @@ function renderChart() {
 
     const row = document.createElement("div");
     row.classList.add("emotion-row");
-
     row.innerHTML = `
       <div class="emotion-label">
         <span>${emotion}</span>
@@ -50,7 +51,6 @@ function renderChart() {
         <div class="emotion-bar" style="width:${percent}%"></div>
       </div>
     `;
-
     emotionChart.appendChild(row);
   });
 
@@ -84,7 +84,6 @@ function normalizeEmotion(rawEmotion) {
   const emotion = String(rawEmotion || "")
     .trim()
     .toLowerCase();
-
   const aliases = {
     angry: "anger",
     happiness: "happy",
@@ -92,7 +91,6 @@ function normalizeEmotion(rawEmotion) {
     fearful: "fear",
     surprised: "surprise",
   };
-
   return aliases[emotion] || emotion;
 }
 
@@ -108,7 +106,6 @@ function setStatus(message) {
 
 function resizeOverlayToVideo() {
   if (!video.videoWidth || !video.videoHeight) return;
-
   if (
     overlay.width !== video.videoWidth ||
     overlay.height !== video.videoHeight
@@ -121,43 +118,71 @@ function resizeOverlayToVideo() {
 function drawFaceBox(box) {
   resizeOverlayToVideo();
   overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
-
   if (!box) return;
 
-  // The video preview is mirrored with CSS, so the rectangle must be mirrored too.
-  const mirroredX = overlay.width - (box.x + box.width);
+  const x = MIRROR_PREVIEW ? overlay.width - (box.x + box.width) : box.x;
+  const y = box.y;
 
   overlayCtx.strokeStyle = "#22c55e";
   overlayCtx.lineWidth = Math.max(3, overlay.width * 0.006);
-  overlayCtx.strokeRect(mirroredX, box.y, box.width, box.height);
+  overlayCtx.strokeRect(x, y, box.width, box.height);
 
   overlayCtx.fillStyle = "rgba(34, 197, 94, 0.92)";
-  overlayCtx.fillRect(
-    mirroredX,
-    Math.max(box.y - 34, 0),
-    Math.min(150, box.width),
-    28,
-  );
+  overlayCtx.fillRect(x, Math.max(y - 32, 0), Math.min(150, box.width), 26);
 
   overlayCtx.fillStyle = "#03130a";
-  overlayCtx.font = `${Math.max(15, overlay.width * 0.025)}px Arial`;
-  overlayCtx.fillText(
-    "Face detected",
-    mirroredX + 10,
-    Math.max(box.y - 13, 20),
-  );
+  overlayCtx.font = `${Math.max(14, overlay.width * 0.024)}px Arial`;
+  overlayCtx.fillText("Face detected", x + 9, Math.max(y - 13, 18));
+}
+
+function clampBox(box) {
+  const x = Math.max(0, Math.min(box.x, video.videoWidth - 1));
+  const y = Math.max(0, Math.min(box.y, video.videoHeight - 1));
+  const width = Math.max(1, Math.min(box.width, video.videoWidth - x));
+  const height = Math.max(1, Math.min(box.height, video.videoHeight - y));
+  return { x, y, width, height };
+}
+
+function getBoxFromDetection(detection) {
+  const relativeBox = detection?.locationData?.relativeBoundingBox;
+  if (relativeBox) {
+    return clampBox({
+      x: relativeBox.xMin * video.videoWidth,
+      y: relativeBox.yMin * video.videoHeight,
+      width: relativeBox.width * video.videoWidth,
+      height: relativeBox.height * video.videoHeight,
+    });
+  }
+
+  const bbox = detection?.boundingBox;
+  if (!bbox) return null;
+
+  // Some MediaPipe versions return normalized center values, others return pixel values.
+  const width = bbox.width <= 1 ? bbox.width * video.videoWidth : bbox.width;
+  const height =
+    bbox.height <= 1 ? bbox.height * video.videoHeight : bbox.height;
+  const xCenter =
+    bbox.xCenter <= 1 ? bbox.xCenter * video.videoWidth : bbox.xCenter;
+  const yCenter =
+    bbox.yCenter <= 1 ? bbox.yCenter * video.videoHeight : bbox.yCenter;
+
+  return clampBox({
+    x: xCenter - width / 2,
+    y: yCenter - height / 2,
+    width,
+    height,
+  });
 }
 
 function getPaddedBox(box) {
   const padX = box.width * FACE_PADDING_RATIO;
   const padY = box.height * FACE_PADDING_RATIO;
-
-  const x = Math.max(0, box.x - padX);
-  const y = Math.max(0, box.y - padY);
-  const width = Math.min(video.videoWidth - x, box.width + padX * 2);
-  const height = Math.min(video.videoHeight - y, box.height + padY * 2);
-
-  return { x, y, width, height };
+  return clampBox({
+    x: box.x - padX,
+    y: box.y - padY,
+    width: box.width + padX * 2,
+    height: box.height + padY * 2,
+  });
 }
 
 function createFaceBlob(box) {
@@ -166,7 +191,6 @@ function createFaceBlob(box) {
     const canvas = document.createElement("canvas");
     canvas.width = 224;
     canvas.height = 224;
-
     const ctx = canvas.getContext("2d");
     ctx.drawImage(
       video,
@@ -179,22 +203,35 @@ function createFaceBlob(box) {
       canvas.width,
       canvas.height,
     );
-    canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.9);
+    canvas.toBlob((blob) => resolve(blob), "image/jpeg", 0.92);
   });
 }
 
 async function startCamera() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: "user",
-        width: { ideal: 640 },
-        height: { ideal: 480 },
-      },
-      audio: false,
-    });
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { exact: "user" },
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+        },
+        audio: false,
+      });
+    } catch (frontCameraError) {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+        },
+        audio: false,
+      });
+    }
 
     video.srcObject = stream;
+    await video.play();
 
     video.onloadedmetadata = async () => {
       resizeOverlayToVideo();
@@ -202,6 +239,13 @@ async function startCamera() {
       await setupFaceDetector();
       startFaceLoop();
     };
+
+    if (video.readyState >= 2) {
+      resizeOverlayToVideo();
+      setStatus("Looking for face...");
+      await setupFaceDetector();
+      startFaceLoop();
+    }
   } catch (error) {
     emotionText.innerText = "Camera Error";
     confidenceText.innerText = "Could not access camera.";
@@ -212,9 +256,10 @@ async function startCamera() {
 
 async function setupFaceDetector() {
   if (!window.FaceDetection) {
-    setStatus("Face detector failed to load");
+    setStatus("Face detector library failed");
     return;
   }
+  if (faceDetector) return;
 
   faceDetector = new FaceDetection({
     locateFile: (file) =>
@@ -223,32 +268,31 @@ async function setupFaceDetector() {
 
   faceDetector.setOptions({
     model: "short",
-    minDetectionConfidence: 0.65,
+    minDetectionConfidence: 0.45,
   });
 
   faceDetector.onResults((results) => {
-    if (!results.detections || results.detections.length === 0) {
-      latestFaceBox = null;
-      drawFaceBox(null);
-      setStatus("No face detected");
-      emotionText.innerText = "No face detected";
-      confidenceText.innerText = "Confidence: 0%";
-      liveBar.style.width = "0%";
+    const detections = results?.detections || [];
+
+    if (detections.length === 0) {
+      noFaceFrames += 1;
+      if (noFaceFrames >= 5) {
+        latestFaceBox = null;
+        drawFaceBox(null);
+        setStatus("No face detected");
+        emotionText.innerText = "No face detected";
+        confidenceText.innerText = "Confidence: 0%";
+        liveBar.style.width = "0%";
+      }
       return;
     }
 
-    const detection = results.detections[0];
-    const bbox = detection.boundingBox;
+    noFaceFrames = 0;
+    const boxes = detections.map(getBoxFromDetection).filter(Boolean);
+    if (boxes.length === 0) return;
 
-    latestFaceBox = {
-      x: bbox.xCenter * video.videoWidth - (bbox.width * video.videoWidth) / 2,
-      y:
-        bbox.yCenter * video.videoHeight -
-        (bbox.height * video.videoHeight) / 2,
-      width: bbox.width * video.videoWidth,
-      height: bbox.height * video.videoHeight,
-    };
-
+    boxes.sort((a, b) => b.width * b.height - a.width * a.height);
+    latestFaceBox = boxes[0];
     drawFaceBox(latestFaceBox);
     setStatus(isDetecting ? "Analyzing..." : "Face detected");
   });
@@ -256,7 +300,6 @@ async function setupFaceDetector() {
 
 async function startFaceLoop() {
   if (!faceDetector || isFaceLoopRunning) return;
-
   isFaceLoopRunning = true;
 
   async function loop() {
@@ -272,7 +315,11 @@ async function startFaceLoop() {
     }
 
     const now = Date.now();
-    if (latestFaceBox && now - lastInferenceAt >= INFERENCE_INTERVAL_MS) {
+    if (
+      latestFaceBox &&
+      !isDetecting &&
+      now - lastInferenceAt >= INFERENCE_INTERVAL_MS
+    ) {
       lastInferenceAt = now;
       detectEmotion(latestFaceBox);
     }
@@ -291,7 +338,6 @@ async function detectEmotion(faceBox) {
     video.videoHeight === 0
   )
     return;
-
   isDetecting = true;
   setStatus("Analyzing...");
 
@@ -305,11 +351,10 @@ async function detectEmotion(faceBox) {
     const response = await fetch(API_URL, {
       method: "POST",
       body: formData,
+      cache: "no-store",
     });
 
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`API error: ${response.status}`);
 
     const data = await response.json();
     const emotion = normalizeEmotion(
@@ -337,15 +382,21 @@ async function detectEmotion(faceBox) {
     emotionCounts[emotion] += 1;
     totalDetections += 1;
     renderChart();
+    setStatus("Face detected");
   } catch (error) {
     emotionText.innerText = "API Error";
-    confidenceText.innerText = "Check the backend link or Render service.";
+    confidenceText.innerText = "Check backend / Render service.";
     setStatus("API Error");
     console.error(error);
   } finally {
     isDetecting = false;
   }
 }
+
+window.addEventListener("resize", () => {
+  resizeOverlayToVideo();
+  drawFaceBox(latestFaceBox);
+});
 
 renderChart();
 startCamera();

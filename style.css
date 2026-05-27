@@ -494,35 +494,49 @@ button:disabled {
   }
 }
 
-/* ===== Face Detection Page Fixes ===== */
+/* ===== Face Detection Page: mobile + real-time layout fix ===== */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 .face-page {
   align-items: flex-start;
   min-height: 100dvh;
+  overflow-x: hidden;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 .face-container {
   width: min(100% - 28px, 1120px);
-  padding: 78px 0 36px;
+  max-width: 1120px;
+  padding: 76px 0 36px;
+  margin: 0 auto;
 }
 
 .face-container h1 {
-  font-size: clamp(2rem, 6vw, 4rem);
-  margin-bottom: 12px;
+  font-size: clamp(1.9rem, 5vw, 4rem);
+  margin-bottom: 10px;
 }
 
 .face-container .subtitle {
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .face-layout {
+  width: 100%;
   display: grid;
-  grid-template-columns: minmax(280px, 1.2fr) minmax(280px, 0.8fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
   gap: 22px;
   align-items: start;
 }
 
 .camera-card,
 .face-stats-box {
+  min-width: 0;
   background: rgba(22, 27, 34, 0.96);
   border: 1px solid #30363d;
   border-radius: 25px;
@@ -565,14 +579,15 @@ button:disabled {
 
 .camera-status {
   position: absolute;
-  left: 14px;
-  bottom: 14px;
-  padding: 8px 12px;
+  left: 12px;
+  bottom: 12px;
+  max-width: calc(100% - 24px);
+  padding: 7px 11px;
   border-radius: 999px;
   background: rgba(13, 17, 23, 0.78);
   border: 1px solid rgba(148, 163, 184, 0.22);
   color: #e5e7eb;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   backdrop-filter: blur(8px);
 }
 
@@ -581,19 +596,19 @@ button:disabled {
   justify-content: space-between;
   align-items: center;
   gap: 14px;
-  padding: 18px 4px 8px;
+  padding: 16px 4px 8px;
   text-align: left;
 }
 
 .summary-label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   color: #9ca3af;
-  font-size: 0.86rem;
+  font-size: 0.85rem;
 }
 
 .emotion-summary h2 {
-  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  font-size: clamp(1.4rem, 4vw, 2.35rem);
   color: #ffffff;
   text-transform: capitalize;
 }
@@ -613,6 +628,7 @@ button:disabled {
   max-width: none;
   margin: 0;
   padding: 22px;
+  overflow: hidden;
 }
 
 .face-stats-box .pie-chart {
@@ -622,41 +638,44 @@ button:disabled {
 
 @media (max-width: 900px) {
   .face-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .face-container {
-    padding-top: 72px;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 700px) {
-  body {
-    align-items: flex-start;
+  body.face-page {
+    display: block;
+    overflow-x: hidden;
   }
 
   .face-container {
-    width: min(100% - 20px, 520px);
-    padding: 70px 0 24px;
+    width: calc(100% - 24px);
+    padding: 62px 0 24px;
+  }
+
+  .face-container h1 {
+    font-size: 2rem;
   }
 
   .face-container .subtitle {
-    margin-bottom: 16px;
-    font-size: 0.98rem;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
   }
 
+  .face-page .face-back-btn,
   .face-page .back-btn {
     position: fixed;
     top: max(12px, env(safe-area-inset-top));
     left: 12px;
+    z-index: 999;
     margin: 0;
-    padding: 9px 12px;
+    padding: 8px 11px;
     border-radius: 12px;
-    font-size: 0.9rem;
+    font-size: 0.86rem;
   }
 
   .camera-card {
-    padding: 12px;
+    padding: 10px;
     border-radius: 20px;
   }
 
@@ -668,7 +687,8 @@ button:disabled {
   .emotion-summary {
     flex-direction: column;
     align-items: flex-start;
-    padding: 14px 2px 6px;
+    gap: 4px;
+    padding: 13px 2px 5px;
   }
 
   .emotion-summary p {
@@ -676,20 +696,21 @@ button:disabled {
   }
 
   .face-stats-box {
-    padding: 18px;
+    padding: 16px;
     border-radius: 20px;
   }
 
   .emotion-row {
-    margin-bottom: 14px;
+    margin-bottom: 13px;
   }
 
   .emotion-label {
-    font-size: 0.92rem;
+    gap: 8px;
+    font-size: 0.9rem;
   }
 
   .face-stats-box .pie-chart {
-    width: 135px;
-    height: 135px;
+    width: 132px;
+    height: 132px;
   }
 }
