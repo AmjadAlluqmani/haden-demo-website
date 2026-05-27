@@ -34,6 +34,8 @@ async function startSession() {
     alert("Please enter name, gender, and age.");
     return;
   }
+  startBtn.disabled = true;
+  startBtn.innerText = "Starting...";
 
   childData = {
     childName,
@@ -68,6 +70,8 @@ async function startSession() {
   } catch (error) {
     alert("Error connecting to Noor API.");
     console.log(error);
+    startBtn.disabled = false;
+    startBtn.innerText = "Start Session";
   }
 }
 
