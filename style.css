@@ -5,16 +5,43 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
 body {
   background: #0d1117;
   color: white;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow-x: hidden;
   overflow-y: auto;
   position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(59, 130, 246, 0.26) 0%,
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at bottom right,
+      rgba(139, 92, 246, 0.24) 0%,
+      transparent 32%
+    );
 }
 
 .overlay {
@@ -26,25 +53,42 @@ body {
   opacity: 0.25;
 }
 
+.container,
+.chat-container,
+.face-container,
+.setup-box,
+#chat-section,
+.chat-box,
+.input-area,
+.report-box,
+.card,
+.camera-card,
+.face-stats-box {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .container {
   position: relative;
   z-index: 2;
   text-align: center;
-  width: 90%;
-  max-width: 1100px;
+  width: min(100% - 32px, 1100px);
   padding: 40px 0;
 }
 
 .chat-container {
-  width: 90%;
-  max-width: 1000px;
-  margin: auto;
-  padding: 40px 0;
+  position: relative;
+  z-index: 2;
+  width: min(100% - 32px, 760px);
+  margin: 0 auto;
+  padding: 86px 0 34px;
+  text-align: center;
 }
 
 h1 {
-  font-size: 4rem;
-  margin-bottom: 20px;
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 1.1;
+  margin-bottom: 22px;
 }
 
 .subtitle {
@@ -55,16 +99,17 @@ h1 {
 
 .back-btn {
   position: fixed;
-  top: 24px;
-  left: 24px;
-  z-index: 20;
+  top: 18px;
+  left: 18px;
+  z-index: 999;
   color: white;
   text-decoration: none;
-  background: #161b22;
+  background: rgba(22, 27, 34, 0.94);
   border: 1px solid #30363d;
-  padding: 12px 18px;
-  border-radius: 14px;
+  padding: 10px 14px;
+  border-radius: 13px;
   transition: 0.3s;
+  backdrop-filter: blur(10px);
 }
 
 .back-btn:hover {
@@ -204,15 +249,26 @@ video {
   border: 1px solid #30363d;
 }
 
+/* ===== Text Chat Page ===== */
+
+#chat-section {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 .chat-box {
-  height: 500px;
+  width: 100%;
+  height: 46dvh;
+  min-height: 300px;
+  max-height: 520px;
   overflow-y: auto;
-  background: #161b22;
+  overflow-x: hidden;
+  background: rgba(22, 27, 34, 0.96);
   border: 1px solid #30363d;
   border-radius: 20px;
-  padding: 20px;
-  margin-top: 30px;
-  margin-bottom: 20px;
+  padding: 16px;
+  margin: 0 0 14px;
+  text-align: left;
 }
 
 .avatar-chat-box {
@@ -220,40 +276,60 @@ video {
 }
 
 .message {
-  padding: 15px;
+  width: fit-content;
+  max-width: min(78%, 560px);
+  padding: 12px 14px;
   border-radius: 15px;
-  margin-bottom: 15px;
-  max-width: 75%;
-  line-height: 1.6;
+  margin-bottom: 12px;
+  line-height: 1.65;
+  font-size: 0.96rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .user {
   background: #2563eb;
   margin-left: auto;
+  text-align: left;
 }
 
 .bot {
   background: #30363d;
+  margin-right: auto;
+  text-align: right;
+  direction: rtl;
 }
 
 .input-area {
+  width: 100%;
   display: flex;
-  gap: 15px;
+  gap: 12px;
 }
 
 input,
 select {
   flex: 1;
-  padding: 18px;
+  width: 100%;
+  min-width: 0;
+  padding: 16px;
   border-radius: 15px;
   background: #161b22;
   color: white;
   font-size: 1rem;
   border: 1px solid #30363d;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
 }
 
 button {
-  padding: 18px 30px;
+  width: auto;
+  min-width: 110px;
+  padding: 16px 26px;
   border: none;
   border-radius: 15px;
   background: #8b5cf6;
@@ -273,60 +349,141 @@ button:disabled {
 }
 
 .setup-box {
-  background: #161b22;
+  width: min(100%, 500px);
+  background: rgba(22, 27, 34, 0.96);
   border: 1px solid #30363d;
   border-radius: 25px;
-  padding: 30px;
-  margin: 30px auto;
-  max-width: 500px;
+  padding: 28px;
+  margin: 24px auto;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  text-align: left;
 }
 
 .setup-box h2 {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+}
+
+.setup-box button {
+  width: 100%;
 }
 
 .end-btn {
-  margin-top: 20px;
+  width: 100%;
+  margin-top: 12px;
   background: #dc2626;
 }
 
+/* This hides the red button with the current JS because the JS disables it after report generation */
+.end-btn:disabled {
+  display: none !important;
+}
+
+/* ===== Clean Report Design ===== */
+
 .report-box {
-  margin-top: 20px;
-  background: #0b1220;
+  display: none;
+  width: 100%;
+  margin-top: 14px;
+  padding: 20px;
+  background: rgba(17, 24, 39, 0.98);
   border: 1px solid #30363d;
   border-radius: 20px;
-  padding: 20px;
-  white-space: pre-wrap;
   text-align: left;
-  display: none;
+  white-space: normal;
+  overflow-x: hidden;
+}
+
+.report-box::before {
+  content: "Report";
+  display: block;
+  color: #ffffff;
+  font-size: 1.55rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 16px;
 }
 
 .report-card {
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 20px;
-  text-align: right;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #30363d;
+  border-radius: 0;
+  padding: 14px 0;
+  margin: 0;
+  text-align: left;
+}
+
+.report-card:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* Hide less important report blocks from the current JS:
+   1 Summary, 2 Emotional State, 3 Engagement, 4 Risk Flags, 5 Recommendations, 6 Priority */
+.report-card:nth-of-type(3),
+.report-card:nth-of-type(6) {
+  display: none !important;
 }
 
 .report-card h2 {
-  margin-bottom: 15px;
   color: #8b5cf6;
+  font-size: 1rem;
+  margin-bottom: 8px;
+  text-align: left;
 }
 
 .report-card p,
 .report-card li {
-  line-height: 1.8;
+  line-height: 1.75;
   color: #e5e7eb;
+  font-size: 0.92rem;
 }
 
 .report-card ul {
-  padding-right: 20px;
+  padding-left: 20px;
+  padding-right: 0;
 }
+
+/* Support the newer report class names too */
+.report-main-title,
+.report-title {
+  color: #ffffff;
+  font-size: 1.55rem;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.clean-report-section,
+.report-section {
+  border-top: 1px solid #30363d;
+  padding: 14px 0;
+}
+
+.clean-report-section h3,
+.report-section h3 {
+  color: #8b5cf6;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.clean-report-section p,
+.clean-report-section li,
+.report-section p,
+.report-section li {
+  color: #e5e7eb;
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+
+.clean-report-section ul,
+.report-section ul {
+  padding-left: 20px;
+}
+
+/* ===== Avatar Chat Page ===== */
 
 .avatar-wrapper {
   display: flex;
@@ -430,77 +587,7 @@ button:disabled {
   text-align: center;
 }
 
-@keyframes softPulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.75;
-  }
-  50% {
-    transform: scale(1.04);
-    opacity: 1;
-  }
-}
-
-@keyframes strongPulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.12);
-  }
-}
-
-@media (max-width: 700px) {
-  h1 {
-    font-size: 2.6rem;
-  }
-
-  .subtitle {
-    margin-bottom: 35px;
-  }
-
-  .card {
-    width: 100%;
-  }
-
-  .input-area {
-    flex-direction: column;
-  }
-
-  .message {
-    max-width: 100%;
-  }
-
-  .chat-box {
-    height: 420px;
-  }
-
-  .back-btn {
-    position: static;
-    display: inline-block;
-    margin: 20px;
-  }
-
-  .voice-visualizer {
-    width: 170px;
-    height: 170px;
-  }
-
-  .voice-visualizer span {
-    width: 85px;
-    height: 85px;
-  }
-}
-
-/* ===== Face Detection Page: mobile + real-time layout fix ===== */
-html,
-body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
+/* ===== Face Detection Page ===== */
 
 .face-page {
   align-items: flex-start;
@@ -515,6 +602,8 @@ body {
   max-width: 1120px;
   padding: 76px 0 36px;
   margin: 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .face-container h1 {
@@ -636,13 +725,180 @@ body {
   height: 155px;
 }
 
+/* ===== Animations ===== */
+
+@keyframes softPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes strongPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+/* ===== Tablet ===== */
+
 @media (max-width: 900px) {
   .face-layout {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
+/* ===== Mobile ===== */
+
 @media (max-width: 700px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+    touch-action: pan-y;
+  }
+
+  body {
+    display: block;
+  }
+
+  .container {
+    width: calc(100% - 28px);
+    padding: 70px 0 24px;
+  }
+
+  .chat-container {
+    width: 100%;
+    padding: 76px 14px 18px;
+  }
+
+  .chat-container h1 {
+    font-size: 1.75rem;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    margin-bottom: 35px;
+    font-size: 0.98rem;
+  }
+
+  .back-btn {
+    top: max(14px, env(safe-area-inset-top));
+    left: 14px;
+    padding: 8px 11px;
+    border-radius: 12px;
+    font-size: 0.82rem;
+  }
+
+  .card {
+    width: 100%;
+    padding: 30px 22px;
+  }
+
+  .setup-box {
+    width: 100%;
+    padding: 20px;
+    border-radius: 20px;
+    margin: 0 auto;
+    gap: 13px;
+  }
+
+  .setup-box h2 {
+    text-align: left;
+    font-size: 1.12rem;
+  }
+
+  input,
+  select,
+  button {
+    padding: 14px;
+    font-size: 0.92rem;
+    border-radius: 13px;
+  }
+
+  .chat-box {
+    height: 43dvh;
+    min-height: 270px;
+    max-height: none;
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .message {
+    max-width: 94%;
+    padding: 10px 12px;
+    font-size: 0.86rem;
+    border-radius: 13px;
+  }
+
+  .input-area {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .input-area button,
+  .end-btn {
+    width: 100%;
+  }
+
+  .end-btn {
+    margin-top: 10px;
+  }
+
+  .report-box {
+    padding: 16px;
+    border-radius: 16px;
+    margin-top: 14px;
+  }
+
+  .report-box::before,
+  .report-main-title,
+  .report-title {
+    font-size: 1.32rem;
+    margin-bottom: 12px;
+  }
+
+  .report-card {
+    padding: 12px 0;
+  }
+
+  .report-card h2,
+  .clean-report-section h3,
+  .report-section h3 {
+    font-size: 0.95rem;
+  }
+
+  .report-card p,
+  .report-card li,
+  .clean-report-section p,
+  .clean-report-section li,
+  .report-section p,
+  .report-section li {
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+
+  .voice-visualizer {
+    width: 170px;
+    height: 170px;
+  }
+
+  .voice-visualizer span {
+    width: 85px;
+    height: 85px;
+  }
+
   body.face-page {
     display: block;
     overflow-x: hidden;
@@ -715,344 +971,23 @@ body {
   }
 }
 
-/* ===== Text Chat Responsive Fix ===== */
+/* ===== Very Small Phones ===== */
 
-body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.chat-container {
-  width: min(100% - 32px, 760px);
-  margin: 0 auto;
-  padding: 90px 0 40px;
-  text-align: center;
-}
-
-.chat-container h1 {
-  font-size: clamp(2rem, 6vw, 4rem);
-  line-height: 1.1;
-  margin-bottom: 24px;
-}
-
-.setup-box {
-  width: 100%;
-  max-width: 500px;
-  padding: 28px;
-  margin: 24px auto;
-}
-
-.setup-box input,
-.setup-box select,
-.setup-box button {
-  width: 100%;
-  min-width: 0;
-}
-
-#chat-section {
-  width: 100%;
-}
-
-.chat-box {
-  width: 100%;
-}
-
-.input-area {
-  width: 100%;
-}
-
-.input-area input {
-  min-width: 0;
-}
-
-.back-btn {
-  top: 18px;
-  left: 18px;
-}
-
-/* Mobile */
-@media (max-width: 700px) {
-  body {
-    display: block;
-    min-height: 100dvh;
-  }
-
-  .chat-container {
-    width: calc(100% - 28px);
-    padding: 86px 0 28px;
-  }
-
-  .chat-container h1 {
-    font-size: 2rem;
-    margin-bottom: 22px;
-  }
-
-  .setup-box {
-    padding: 22px;
-    border-radius: 22px;
-    margin: 0 auto;
-    gap: 13px;
-  }
-
-  .setup-box h2 {
-    text-align: left;
-    font-size: 1.15rem;
-  }
-
-  input,
-  select,
-  button {
-    padding: 15px;
-    font-size: 0.95rem;
-    border-radius: 13px;
-  }
-
-  .back-btn {
-    position: fixed;
-    top: 14px;
-    left: 14px;
-    margin: 0;
-    padding: 9px 12px;
-    font-size: 0.85rem;
-    border-radius: 12px;
-  }
-
-  .chat-box {
-    height: 58dvh;
-    margin-top: 18px;
-    padding: 14px;
-  }
-
-  .input-area {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .message {
-    max-width: 92%;
-    padding: 12px;
-    font-size: 0.95rem;
-  }
-
-  .user {
-    margin-left: auto;
-  }
-
-  .bot {
-    margin-right: auto;
-  }
-
-  .end-btn {
-    width: 100%;
-  }
-
-  .report-box {
-    padding: 14px;
-  }
-}
-
-/* Very small phones */
 @media (max-width: 390px) {
   .chat-container {
-    width: calc(100% - 22px);
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+
+  .chat-container h1 {
+    font-size: 1.62rem;
   }
 
   .setup-box {
     padding: 18px;
-  }
-
-  .chat-container h1 {
-    font-size: 1.8rem;
-  }
-}
-
-/* ===== Kill horizontal scroll completely ===== */
-html,
-body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: clip;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  position: relative;
-}
-
-.chat-container,
-.setup-box,
-#chat-section,
-.chat-box,
-.input-area,
-.report-box {
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.chat-container {
-  width: min(100% - 28px, 760px);
-  margin-inline: auto;
-  padding-inline: 0;
-}
-
-.setup-box {
-  width: 100%;
-  margin-inline: auto;
-}
-
-input,
-select,
-button {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-@media (max-width: 700px) {
-  html,
-  body {
-    overflow-x: clip;
-    touch-action: pan-y;
-  }
-
-  body {
-    display: block;
-  }
-
-  .chat-container {
-    width: calc(100vw - 28px);
-    padding-top: 95px;
-    padding-bottom: 30px;
-  }
-
-  .setup-box {
-    padding: 18px;
-  }
-
-  .back-btn {
-    position: fixed;
-    top: 45px;
-    left: 22px;
-    margin: 0;
-    z-index: 999;
-  }
-}
-
-/* ===== Better Text Chat Mobile Layout + Report Design ===== */
-
-@media (max-width: 700px) {
-  .chat-container {
-    width: calc(100% - 28px);
-    padding-top: 78px;
-    padding-bottom: 18px;
-  }
-
-  .chat-container h1 {
-    font-size: 1.75rem;
-    margin-bottom: 16px;
   }
 
   .chat-box {
-    height: 46dvh;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .message {
-    max-width: 94%;
-    font-size: 0.86rem;
-    padding: 10px 12px;
-    border-radius: 13px;
-    line-height: 1.6;
-  }
-
-  .input-area {
-    gap: 8px;
-  }
-
-  .input-area input,
-  .input-area button,
-  .end-btn {
-    padding: 13px;
-    border-radius: 12px;
-    font-size: 0.88rem;
-  }
-
-  .end-btn {
-    margin-top: 10px;
-  }
-
-  .back-btn {
-    top: 20px;
-    left: 15px;
-  }
-}
-
-/* Report */
-.report-box {
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 20px;
-  padding: 22px;
-  margin-top: 18px;
-  text-align: left;
-  white-space: normal;
-}
-
-.report-title {
-  font-size: 1.65rem;
-  color: #ffffff;
-  text-align: center;
-  margin-bottom: 18px;
-}
-
-.report-section {
-  border-top: 1px solid #30363d;
-  padding-top: 14px;
-  margin-top: 14px;
-}
-
-.report-section h3 {
-  color: #8b5cf6;
-  font-size: 1rem;
-  margin-bottom: 8px;
-}
-
-.report-section p,
-.report-section li {
-  color: #e5e7eb;
-  font-size: 0.92rem;
-  line-height: 1.7;
-}
-
-.report-section ul {
-  padding-left: 20px;
-}
-
-@media (max-width: 700px) {
-  .report-box {
-    padding: 16px;
-    border-radius: 16px;
-  }
-
-  .report-title {
-    font-size: 1.35rem;
-  }
-
-  .report-section h3 {
-    font-size: 0.95rem;
-  }
-
-  .report-section p,
-  .report-section li {
-    font-size: 0.85rem;
+    height: 42dvh;
   }
 }

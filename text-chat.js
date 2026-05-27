@@ -113,6 +113,10 @@ async function sendMessage() {
 }
 
 async function endSession() {
+  endBtn.style.display = "none";
+  input.disabled = true;
+  sendBtn.disabled = true;
+
   try {
     addMessage("Generating session report...", "bot");
 
@@ -134,59 +138,43 @@ async function endSession() {
     reportBox.style.display = "block";
 
     reportBox.innerHTML = `
-  <h2 class="report-title">Report</h2>
+      <h2 class="report-main-title">Report</h2>
 
-  <div class="report-section">
-    <h3>Session Summary</h3>
-    <p>${report.session_summary || "No summary available."}</p>
-  </div>
+      <div class="clean-report-section">
+        <h3>Session Summary</h3>
+        <p>${report.session_summary || "No summary available."}</p>
+      </div>
 
-  <div class="report-section">
-    <h3>Emotional State</h3>
-    <p><strong>Dominant Emotion:</strong> ${
-      report.emotional_state?.dominant || "-"
-    }</p>
-    <p><strong>Stability:</strong> ${
-      report.emotional_state?.stability || "-"
-    }</p>
-  </div>
+      <div class="clean-report-section">
+        <h3>Emotional State</h3>
+        <p><strong>Dominant Emotion:</strong> ${report.emotional_state?.dominant || "-"}</p>
+        <p><strong>Stability:</strong> ${report.emotional_state?.stability || "-"}</p>
+      </div>
 
-  <div class="report-section">
-    <h3>Engagement</h3>
-    <p><strong>Level:</strong> ${report.engagement?.level || "-"}</p>
-    <p>${report.engagement?.style || ""}</p>
-  </div>
+      <div class="clean-report-section">
+        <h3>Risk Status</h3>
+        <p>${
+          report.red_flags && report.red_flags.length > 0
+            ? report.red_flags.join(", ")
+            : "No risk detected"
+        }</p>
+      </div>
 
-  <div class="report-section">
-    <h3>Risk Flags</h3>
-    <p>${
-      report.red_flags && report.red_flags.length > 0
-        ? report.red_flags.join(", ")
-        : "No risk detected"
-    }</p>
-  </div>
+      <div class="clean-report-section">
+        <h3>Recommendations</h3>
+        <ul>
+          ${
+            report.recommendations && report.recommendations.length > 0
+              ? report.recommendations
+                  .map((item) => `<li>${item}</li>`)
+                  .join("")
+              : "<li>No recommendations available.</li>"
+          }
+        </ul>
+      </div>
+    `;
 
-  <div class="report-section">
-    <h3>Recommendations</h3>
-    <ul>
-      ${
-        report.recommendations?.map((item) => `<li>${item}</li>`).join("") ||
-        "<li>No recommendations available.</li>"
-      }
-    </ul>
-  </div>
-
-  <div class="report-section">
-    <h3>Priority</h3>
-    <p>${report.priority || "-"}</p>
-  </div>
-`;
-
-    addMessage("Session ended. The report is shown below.", "bot");
-
-    input.disabled = true;
-    sendBtn.disabled = true;
-    endBtn.style.display = "none";
+    addMessage("Session ended. The report is ready.", "bot");
   } catch (error) {
     addMessage("Error ending session.", "bot");
     console.log(error);
