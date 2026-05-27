@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Noor Text Chat</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <a href="index.html" class="back-btn">← Back</a>
+
+    <div class="chat-container">
+      <h1>Noor Text Chat</h1>
+
+      <div id="setup-box" class="setup-box">
+        <h2>Start Noor Session</h2>
+
+        <input type="text" id="child-name" placeholder="Child name" />
+
+        <select id="child-gender">
+          <option value="">Select gender</option>
+          <option value="ذكر">Male</option>
+          <option value="أنثى">Female</option>
+        </select>
+
+        <select id="child-age">
+          <option value="">Select age</option>
+          <option value="6">6 years</option>
+          <option value="7">7 years</option>
+          <option value="8">8 years</option>
+          <option value="9">9 years</option>
+          <option value="10">10 years</option>
+          <option value="11">11 years</option>
+          <option value="12">12 years</option>
+        </select>
+
+        <button id="start-btn">Start Session</button>
+      </div>
+
+      <div id="chat-section" style="display: none">
+        <div id="chat-box" class="chat-box"></div>
+
+        <div class="input-area">
+          <input
+            type="text"
+            id="message-input"
+            placeholder="Type your message..."
+          />
+          <button id="send-btn">Send</button>
+        </div>
+
+        <button id="end-btn" class="end-btn">End Session & Show Report</button>
+
+        <div id="report-box" class="report-box"></div>
+      </div>
+    </div>
+
+    <script src="text-chat.js"></script>
+  </body>
+</html>

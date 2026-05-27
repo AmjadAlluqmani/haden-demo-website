@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Noor Avatar Experience</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <a href="index.html" class="back-btn">← Back</a>
+
+    <div class="chat-container">
+      <h1>Noor Avatar Experience</h1>
+
+      <div id="setup-box" class="setup-box">
+        <h2>Start Noor Session</h2>
+
+        <input type="text" id="child-name" placeholder="Child name" />
+
+        <select id="child-gender">
+          <option value="">Select gender</option>
+          <option value="ذكر">Male</option>
+          <option value="أنثى">Female</option>
+        </select>
+
+        <select id="child-age">
+          <option value="">Select age</option>
+          <option value="6">6 years</option>
+          <option value="7">7 years</option>
+          <option value="8">8 years</option>
+          <option value="9">9 years</option>
+          <option value="10">10 years</option>
+          <option value="11">11 years</option>
+          <option value="12">12 years</option>
+        </select>
+
+        <button id="start-btn">Start Session</button>
+      </div>
+
+      <div id="avatar-section" style="display: none">
+        <div class="avatar-wrapper">
+          <video
+            id="noor-video"
+            class="noor-video"
+            autoplay
+            playsinline
+          ></video>
+        </div>
+
+        <div class="mode-buttons">
+          <button id="text-mode-btn" class="mode-btn active">Text Chat</button>
+          <button id="voice-mode-btn" class="mode-btn">Voice</button>
+        </div>
+
+        <div id="text-panel">
+          <div id="chat-box" class="chat-box avatar-chat-box"></div>
+
+          <div class="input-area">
+            <input
+              type="text"
+              id="message-input"
+              placeholder="Type your message..."
+            />
+            <button id="send-btn">Send</button>
+          </div>
+        </div>
+
+        <div id="voice-panel" class="voice-panel" style="display: none">
+          <div id="voice-visualizer" class="voice-visualizer">
+            <span></span>
+          </div>
+
+          <p id="voice-status" class="voice-status">Tap the circle and speak</p>
+          <p id="voice-transcript" class="voice-transcript"></p>
+        </div>
+
+        <button id="end-btn" class="end-btn">End Session & Show Report</button>
+
+        <div id="report-box" class="report-box"></div>
+      </div>
+    </div>
+
+    <script src="avatar-chat.js"></script>
+  </body>
+</html>
